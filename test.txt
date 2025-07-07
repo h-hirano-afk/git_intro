@@ -1,2 +1,4 @@
 test file
 test this file now
+git add
+git commit
