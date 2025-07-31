@@ -15,7 +15,7 @@ jobs:
           ORACLE_SID: "XE"
           ORACLE_PWD: "password"  # GitHub Secretsを利用することを推奨
         options: >-
-          --health-cmd="sqlplus -S system/password//localhost:1521/XE -L -q -c 'SELECT 1 FROM dual;'"
+          --health-cmd="sqlplus -S system/password//localhost:1521/XE -L -q -c 'SELECT 1 FROM dual;'" 
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5

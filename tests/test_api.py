@@ -12,7 +12,7 @@ def load_test_cases(filename):
 def test_read_details(test_case):
     input_data = test_case["input"]
     expected_output = test_case["expected"]
-  
+
     response = client.get("/fsportal_dev_apistage/detail", params=input_data)
   
     assert response.status_code == 200
