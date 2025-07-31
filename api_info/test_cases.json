@@ -1,0 +1,69 @@
+{
+  "test_cases": [
+    {
+      "description": "Test with key 'FS Portal' and tags 'テスト' and 'こんにちは'",
+      "input": {
+        "key": ["FS Portal"],
+        "tag": ["テスト", "こんにちは"]
+      },
+      "expected": {
+        "status_code": 200,
+        "response": [
+          {
+            "notice_id": "1",
+            "title": "お知らせ1",
+            "content": "お知らせ1の内容です。",
+            "registration_date": "",
+            "publcation_start": "",
+            "publcation_end": "",
+            "tag": ["テスト", "こんにちは"],
+            "user_name": "ユーザー1"
+          },
+          {
+            "notice_id": "2",
+            "title": "お知らせ2",
+            "content": "お知らせ2の内容です。",
+            "registration_date": "",
+            "publcation_start": "",
+            "publcation_end": "",
+            "tag": ["テスト"],
+            "user_name": "ユーザー2"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Test with key 'CloudNow' and tag 'こんにちは'",
+      "input": {
+        "key": ["CloudNow"],
+        "tag": ["こんにちは"]
+      },
+      "expected": {
+        "status_code": 200,
+        "response": [
+          {
+            "notice_id": "3",
+            "title": "お知らせ3",
+            "content": "お知らせ3の内容です。",
+            "registration_date": "",
+            "publcation_start": "",
+            "publcation_end": "",
+            "tag": ["こんにちは"],
+            "user_name": "ユーザー3"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Test with empty key and tag",
+      "input": {
+        "key": [],
+        "tag": []
+      },
+      "expected": {
+        "status_code": 200,
+        "response": []
+      }
+    }
+  ]
+}

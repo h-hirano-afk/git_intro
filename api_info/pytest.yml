@@ -1,0 +1,81 @@
+name: Run pytest
+on:
+  [push]
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    services:
+      oracle:
+        image: oracleinanutshell/oracle-xe-11g
+        ports:
+          - 1521:1521
+        env:
+          ORACLE_ALLOW_REMOTE: "true"
+          ORACLE_HOME: "/u01/app/oracle"
+          ORACLE_SID: "XE"
+          ORACLE_PWD: "password"  # GitHub Secretsを利用することを推奨
+        options: >-
+          --health-cmd="sqlplus -S system/password//localhost:1521/XE -L -q -c 'SELECT 1 FROM dual;'"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+    # リポジトリをチェックアウト
+    - name: Checkout code
+      uses: actions/checkout@v3
+    # Pythonの環境をセットアップ
+    - name: Setup Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.11
+    # 必要なPythonパッケージをインストール
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest_mock fastapi uvicorn cx_Oracle
+    # DBの初期データ作成
+    - name: Create database and initialize data
+      env:
+        ORACLE_HOME: /u01/app/oracle
+        LD_LIBRARY_PATH: /u01/app/oracle/lib
+      run: |
+        echo "Waiting for OracleDB to start..."
+        sleep 30  # DBが起動するのを待つ
+        # OracleDBに接続して初期データを作成するスクリプトを実行
+        sqlplus system/your_password@//localhost:1521/XE <<EOF
+        -- fsportal_notice_tableへデータ挿入
+        INSERT INTO fsportal_notice_table (title, content, registration_date, user_name, publication_start, publication_end) VALUES ('お知らせ2', 'お知らせ2の内容です。', SYSDATE, 'ユーザー2', SYSDATE, SYSDATE + 7);
+        INSERT INTO fsportal_notice_table (title, content, registration_date, user_name, publication_start, publication_end) VALUES ('お知らせ3', 'お知らせ3の内容です。', SYSDATE, 'ユーザー3', SYSDATE, SYSDATE + 7);
+        INSERT INTO fsportal_notice_table (title, content, registration_date, user_name, publication_start, publication_end) VALUES ('お知らせ012０１２', 'お知らせの内容です。', SYSDATE, 'ユーザー3', SYSDATE, SYSDATE + 7);
+        INSERT INTO fsportal_notice_table (title, content, registration_date, user_name, publication_start, publication_end) VALUES ('お知らせaａAＡ', 'お知らせの内容です。', SYSDATE, 'ユーザー3', SYSDATE, SYSDATE + 7);
+        INSERT INTO fsportal_notice_table (title, content, registration_date, user_name, publication_start, publication_end) VALUES ('お知らせｱア', 'お知らせ3の内容です。', SYSDATE, 'ユーザー3', SYSDATE, SYSDATE + 7);
+        INSERT INTO fsportal_notice_table (title, content, registration_date, user_name, publication_start, publication_end) VALUES ('お知らせ012', 'お知らせの内容です。', SYSDATE, 'ユーザー3', SYSDATE, SYSDATE + 7);
+        INSERT INTO fsportal_notice_table (title, content, registration_date, user_name, publication_start, publication_end) VALUES ('お知らせaaaa', 'お知らせの内容です。', SYSDATE, 'ユーザー3', SYSDATE, SYSDATE + 7);
+        INSERT INTO fsportal_notice_table (title, content, registration_date, user_name, publication_start, publication_end) VALUES ('お知らせｱｱｱｱ', 'お知らせ3の内容です。', SYSDATE, 'ユーザー3', SYSDATE, SYSDATE + 7);
+        INSERT INTO fsportal_notice_table (title, content, registration_date, user_name, publication_start, publication_end) VALUES ('お知らせ０１２', 'お知らせの内容です。', SYSDATE, 'ユーザー3', SYSDATE, SYSDATE + 7);
+        INSERT INTO fsportal_notice_table (title, content, registration_date, user_name, publication_start, publication_end) VALUES ('お知らせＡＡＡＡ', 'お知らせの内容です。', SYSDATE, 'ユーザー3', SYSDATE, SYSDATE + 7);
+        INSERT INTO fsportal_notice_table (title, content, registration_date, user_name, publication_start, publication_end) VALUES ('お知らせアアアア', 'お知らせ3の内容です。', SYSDATE, 'ユーザー3', SYSDATE, SYSDATE + 7);
+        
+        -- fsportal_notice_tag_tableへデータ挿入
+        INSERT INTO fsportal_notice_tag_table (notice_id, tag_id) VALUES (1, 1);
+        INSERT INTO fsportal_notice_tag_table (notice_id, tag_id) VALUES (1, 2);
+        INSERT INTO fsportal_notice_tag_table (notice_id, tag_id) VALUES (2, 2);
+        
+        -- fsportal_mst_tag_tableへデータ挿入
+        INSERT INTO fsportal_mst_tag_table (tag) VALUES ('FS Portal')
+        INSERT INTO fsportal_mst_tag_table (tag) VALUES ('CloudNow');
+        INSERT INTO fsportal_mst_tag_table (tag) VALUES ('QA PlatForm');
+        INSERT INTO fsportal_mst_tag_table (tag) VALUES ('全般');
+        COMMIT;
+        EXIT;
+        EOF
+    # workspace以下のフォルダすべてにPATHを通す
+    - name: Set PATH for all subdirectories in main
+      run: |
+        FOLDERS=$(find $GITHUB_WORKSPACE -type d | tr '\n' ':')
+        PYTHONPATH=${FOLDERS%:}
+        echo "PYTHONPATH is set to $PYTHONPATH"
+        echo "PYTHONPATH=$PYTHONPATH" >> $GITHUB_ENV
+    # テストコードを実行
+    - name: Run pytest
+      run: python -m pytest tests/
