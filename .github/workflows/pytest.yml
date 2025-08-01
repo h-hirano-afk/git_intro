@@ -13,14 +13,12 @@ jobs:
           ORACLE_ALLOW_REMOTE: "true"  # Allow remote connections (useful for testing tools)
           ORACLE_HOME: "/u01/app/oracle"  # Define Oracle Home directory
           ORACLE_SID: "XE"  # Define Oracle System Identifier
-          ORACLE_PWD: ${{ secrets.ORACLE_PASSWORD }}  # Securely retrieve password from GitHub Secrets
+          ORACLE_PWD: password  # Securely retrieve password from GitHub Secrets
         options: >-  # Additional Docker run options
-          --health-cmd="echo 'SELECT 1 FROM DUAL;' | sqlplus -S system/${{ ORACLE_PW }}@//localhost:1521/XE"
+          --health-cmd="echo 'SELECT 1 FROM DUAL;' | sqlplus -S system/password@//localhost:1521/XE"
           --health-interval=10s  # Interval between health checks
           --health-timeout=5s  # Timeout for each health check
           --health-retries=10  # Retry count before service is marked unhealthy
-        with:
-          ORACLE_PW: ${{ secrets.ORACLE_PASSWORD }}
 
     steps:
     - name: Checkout code  # Get the code from the repository
@@ -40,7 +38,7 @@ jobs:
       env:
         ORACLE_HOME: /u01/app/oracle  # Set Oracle environment variables for SQL execution
         LD_LIBRARY_PATH: /u01/app/oracle/lib
-        ORACLE_PASSWORD: ${{ secrets.ORACLE_PASSWORD }}  # Secure password for system user
+        ORACLE_PASSWORD: password  # Secure password for system user
       run: |
         echo "Waiting for OracleDB to start..."
         sleep 30  # DBが起動するのを待つ
