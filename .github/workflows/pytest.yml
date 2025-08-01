@@ -15,7 +15,7 @@ jobs:
           ORACLE_SID: "XE"  # Define Oracle System Identifier
           ORACLE_PWD: ${{ secrets.ORACLE_PASSWORD }}  # Securely retrieve password from GitHub Secrets
         options: >-  # Additional Docker run options
-          --health-cmd="echo 'SELECT 1 FROM DUAL;' | sqlplus -S system/${{ secrets.ORACLE_PASSWORD }}@//localhost:1521/XE"
+          --health-cmd="echo 'SELECT 1 FROM DUAL;' | sqlplus -S system/${{ ORACLE_PWD }}@//localhost:1521/XE"
           --health-interval=10s  # Interval between health checks
           --health-timeout=5s  # Timeout for each health check
           --health-retries=10  # Retry count before service is marked unhealthy
