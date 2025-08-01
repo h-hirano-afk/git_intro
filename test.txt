@@ -1,8 +1,0 @@
-test file
-test this file now
-git add
-git commit
-git delete
-git diff
-
-hello world
