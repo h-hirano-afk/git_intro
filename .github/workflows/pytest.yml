@@ -17,7 +17,7 @@ jobs:
         options: >-  # Additional Docker run options
           --health-cmd="echo 'SELECT 1 FROM DUAL;' | sqlplus -S system/password@//localhost:1521/XE"
           --health-interval=10s  # Interval between health checks
-          --health-timeout=5s  # Timeout for each health check
+          --health-timeout=10s  # Timeout for each health check
           --health-retries=10  # Retry count before service is marked unhealthy
 
     steps:
