@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       oracle:  # Define a Docker service for Oracle XE
-        image: oracleinanutshell/oracle-xe-11g  # Use a lightweight Oracle XE image from DockerHub
+        image: gvenzl/oracle-xe:latest  # Use a latest Oracle XE image from DockerHub
         ports:
           - 1521:1521  # Map default Oracle port to the runner
         env:
